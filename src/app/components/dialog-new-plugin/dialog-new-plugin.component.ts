@@ -436,7 +436,7 @@ export class DialogNewPluginComponent implements OnInit, OnDestroy {
         // Genero el formulario dinámico
         let dConfig = this.fb.group({});
         let formFields = [];
-
+        
         schema.forEach(element => {
             const keys = Object.getOwnPropertyNames(element);
             const field = keys[0];
@@ -567,7 +567,7 @@ export class DialogNewPluginComponent implements OnInit, OnDestroy {
                     // Requerido
                     if (value.required) {
                         // Si el valor por defecto es un array vacío, quito el requerido
-                        if (value.default.length === 0) {
+                        if (value.default !== undefined && value.default !== null && value.default.length === 0) {
                             value.required = false;
                         } else {
                             validators.push(Validators.required);
@@ -639,7 +639,6 @@ export class DialogNewPluginComponent implements OnInit, OnDestroy {
         this.routeField.enable();
         this.consumerField.enable();
         this.validProtocols = this.defaultProtocols;
-
         schema.fields.forEach(field => {
             if (field['protocols'] && field['protocols']['elements'] && field['protocols']['elements']['one_of']) {
                 this.validProtocols = field['protocols']['elements']['one_of'];
@@ -657,12 +656,14 @@ export class DialogNewPluginComponent implements OnInit, OnDestroy {
                 res = field['config'].fields;
             }
         });
-
         return res;
     }
 
     createDocLink(plugin: string): string {
         let url = 'https://docs.konghq.com/hub/kong-inc/' + plugin;
+        if (plugin === 'jwt-keycloak'){
+            url = 'https://github.com/walter-bd/kong-plugin-jwt-keycloak/blob/master/README.md';
+        }
 
         if (plugin === 'proxy-cache-redis') {
             url = 'https://github.com/ligreman/kong-proxy-cache-redis-plugin/blob/master/README.md';
