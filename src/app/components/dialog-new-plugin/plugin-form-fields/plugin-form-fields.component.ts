@@ -136,6 +136,9 @@ export class PluginFormFieldsComponent implements OnInit, OnChanges {
 
     createDocLink(plugin: string): string {
         let url = 'https://docs.konghq.com/hub/kong-inc/' + plugin;
+        if (plugin === 'jwt-keycloak'){
+            url = 'https://github.com/walter-bd/kong-plugin-jwt-keycloak/blob/master/README.md';
+        }
 
         if (plugin === 'proxy-cache-redis') {
             url = 'https://github.com/ligreman/kong-proxy-cache-redis-plugin/blob/master/README.md';
