@@ -45,7 +45,21 @@ export class DialogNewPluginComponent implements OnInit, OnDestroy {
     arrayOfRecords = [];
     mapFields = [];
     fieldTypes = {};
+    plugins = [];
+
     readonly separatorKeysCodes: number[] = [ENTER, COMMA];
+
+    onPluginChange(event) {
+        // Find the selected route in the routes array
+        const selectedPlugin = this.plugins.find(plugin => plugin.id === event.value);
+        const selectedPluginCopy = { ...selectedPlugin };
+
+        if (selectedPlugin) {
+            // Prepare the data for the form based on the selected route
+            this.nameField.setValue(selectedPluginCopy['name']);
+            this.pluginChange(selectedPluginCopy);
+        }
+    }
 
     form = this.fb.group({
         name: ['', [Validators.required]],
@@ -102,14 +116,16 @@ export class DialogNewPluginComponent implements OnInit, OnDestroy {
             this.api.getServices(),
             this.api.getRoutes(),
             this.api.getConsumers(),
-            this.api.getPluginsEnabled()
-        ]).pipe(map(([services, routes, consumers, plugins]) => {
+            this.api.getPluginsEnabled(),
+            this.api.getPlugins()
+        ]).pipe(map(([services, routes, consumers, pluginsList, plugins]) => {
             // forkJoin returns an array of values, here we map those values to an object
             return {
                 services: services['data'],
                 routes: routes['data'],
                 consumers: consumers['data'],
-                plugins: plugins['enabled_plugins']
+                pluginsList: pluginsList['enabled_plugins'],
+                plugins: plugins['data']
             };
         })).subscribe((value) => {
             value.services = _orderBy(value.services, ['name'], ['asc']);
@@ -119,7 +135,8 @@ export class DialogNewPluginComponent implements OnInit, OnDestroy {
             this.servicesList = value.services;
             this.routesList = value.routes;
             this.consumersList = value.consumers;
-            this.pluginsList = value.plugins.sort();
+            this.pluginsList = value.pluginsList.sort();
+            this.plugins = value.plugins;
 
             // ¿vienen datos extra con el service, route o consumer ya elegido?
             if (this.pluginData !== null && this.pluginData.extras !== null) {
